@@ -16,6 +16,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
+    "dev.chomp.rs",
     os.getenv("API_URL")
 ]
 
@@ -76,11 +77,11 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'api',
+        'NAME': os.getenv('API_DB_NAME', 'api'),
         'USER': os.getenv('API_DB_USER'),
         'PASSWORD': os.getenv('API_DB_PASS'),
-        'HOST': 'localhost',
-        'PORT': '',
+        'HOST': os.getenv('API_DB_HOST'),
+        'PORT': os.getenv('API_DB_PORT', '5432')
     }
 }
 
