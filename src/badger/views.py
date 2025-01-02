@@ -18,20 +18,21 @@ class AddGradeCheckView(APIView):
     @require_github_auth
     def post(self, request, *args, **kwargs):
         try:
-            # Get or create course if provided
-            course_id = request.data.get('course_id')
-            course = None
-            if course_id:
-                course, _ = Course.objects.get_or_create(
-                    course_id=course_id,
-                    defaults={'name': request.data.get('course_name', course_id)}
-                )
-
             # Process GatorGrader output
-            grade_service = GradeService()
             grading_output = request.data.get('grading_output', {})
-            results = grade_service.process_gator_output(grading_output)
-            formatted_results = grade_service.format_check_output(results)
+            results = GradeCheck.process_gator_output(grading_output)
+
+            # Handle course data
+            course = None
+            course_id = request.data.get('course_id')
+            if course_id:
+                try:
+                    course = Course.objects.get(course_id=course_id)
+                except Course.DoesNotExist:
+                    course = Course.objects.create(
+                        course_id=course_id,
+                        name=request.data.get('course_name', course_id)
+                    )
             
             data = {
                 'repository_name': request.data.get('repository_name'),
@@ -42,11 +43,12 @@ class AddGradeCheckView(APIView):
                 'assignment_name': request.data.get('assignment_name'),
                 'passed_checks': results['passed_checks'],
                 'total_checks': results['total_checks'],
-                'check_details': formatted_results['details']
+                'check_details': results['details']
             }
 
             grade_check = GradeCheck.objects.create(**data)
             
+            # Generate badge URL
             badge_generator = BadgeGenerator()
             badge_url = badge_generator.generate_badge_url(
                 grade_check.repository_name,
@@ -63,17 +65,11 @@ class AddGradeCheckView(APIView):
                 status=status.HTTP_201_CREATED,
                 content_type='application/json'
             )
-        except ValueError as e:
-            logger.error(f"Validation error in grade check: {str(e)}")
-            return HttpResponse(
-                json.dumps({'error': str(e)}),
-                status=status.HTTP_400_BAD_REQUEST,
-                content_type='application/json'
-            )
+            
         except Exception as e:
             logger.error(f"Error adding grade check: {str(e)}")
             return HttpResponse(
-                json.dumps({'error': 'Internal server error'}),
+                json.dumps({'error': str(e)}),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 content_type='application/json'
             )
