@@ -40,7 +40,7 @@ class GradeCheck(models.Model):
     
     # Course association
     course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True)
-    assignment_name = models.CharField(max_length=255)
+    assignment_name = models.CharField(max_length=255, null=True, blank=True)
     
     # Check results
     passed_checks = models.IntegerField(default=0)

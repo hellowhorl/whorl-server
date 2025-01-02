@@ -22,7 +22,7 @@ urlpatterns = [
     re_path(r'^v1/inventory/', include(('inventory.urls', 'inventory'))),
     re_path(r'^v1/omnipresence/', include(('omnipresence.urls', 'omnipresence'))),
     re_path(r'^v1/persona/', include(('persona.urls', 'persona'))),
-    re_path(r'^v1/badger/', include(('badger.urls', 'badger'))),
+    re_path(r'^v1/badger/', include(('badger.urls'))),
     
     # API Documentation URLs
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', 

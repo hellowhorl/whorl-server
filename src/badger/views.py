@@ -5,22 +5,31 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.mixins import UpdateModelMixin
-from .models import GradeCheck
+from .models import GradeCheck, Course
 from .generate_badger import BadgeGenerator
 from .grade_services import GradeService
+from .auth import require_github_auth
 
 logger = logging.getLogger(__name__)
 
 class AddGradeCheckView(APIView):
     """Handle submission of new grading results."""
     
+    @require_github_auth
     def post(self, request, *args, **kwargs):
         try:
+            # Get or create course if provided
+            course_id = request.data.get('course_id')
+            course = None
+            if course_id:
+                course, _ = Course.objects.get_or_create(
+                    course_id=course_id,
+                    defaults={'name': request.data.get('course_name', course_id)}
+                )
+
             # Process GatorGrader output
             grade_service = GradeService()
             grading_output = request.data.get('grading_output', {})
-            
-            # Validate and process the output
             results = grade_service.process_gator_output(grading_output)
             formatted_results = grade_service.format_check_output(results)
             
@@ -29,6 +38,8 @@ class AddGradeCheckView(APIView):
                 'student_username': request.data.get('student_username'),
                 'workflow_run_id': request.data.get('workflow_run_id'),
                 'commit_hash': request.data.get('commit_hash'),
+                'course': course,
+                'assignment_name': request.data.get('assignment_name'),
                 'passed_checks': results['passed_checks'],
                 'total_checks': results['total_checks'],
                 'check_details': formatted_results['details']
@@ -36,7 +47,6 @@ class AddGradeCheckView(APIView):
 
             grade_check = GradeCheck.objects.create(**data)
             
-            # Generate badge URL
             badge_generator = BadgeGenerator()
             badge_url = badge_generator.generate_badge_url(
                 grade_check.repository_name,
@@ -71,34 +81,40 @@ class AddGradeCheckView(APIView):
 class UpdateGradeCheckView(GenericAPIView, UpdateModelMixin):
     """Handle updates to existing grade checks."""
     
+    @require_github_auth
     def patch(self, request, *args, **kwargs):
         try:
             workflow_run_id = request.data.get('workflow_run_id')
             grade_check = GradeCheck.objects.get(workflow_run_id=workflow_run_id)
             
-            # Process new GatorGrader output
+            # Update course information if provided
+            course_id = request.data.get('course_id')
+            if course_id:
+                course, _ = Course.objects.get_or_create(
+                    course_id=course_id,
+                    defaults={'name': request.data.get('course_name', course_id)}
+                )
+                grade_check.course = course
+            
+            # Process GatorGrader output
             grade_service = GradeService()
             grading_output = request.data.get('grading_output', {})
             results = grade_service.process_gator_output(grading_output)
             formatted_results = grade_service.format_check_output(results)
             
-            # Update grade check
             grade_check.passed_checks = results['passed_checks']
             grade_check.total_checks = results['total_checks']
             grade_check.check_details = formatted_results['details']
             grade_check.save()
             
-            # Generate updated badge URL
             badge_generator = BadgeGenerator()
-            badge_url = badge_generator.generate_badge_url(
+            response_data = grade_check.as_dict()
+            response_data['badge_url'] = badge_generator.generate_badge_url(
                 grade_check.repository_name,
                 grade_check.passed_checks,
                 grade_check.total_checks,
                 grade_check.status
             )
-            
-            response_data = grade_check.as_dict()
-            response_data['badge_url'] = badge_url
 
             return HttpResponse(
                 json.dumps(response_data),
@@ -111,13 +127,6 @@ class UpdateGradeCheckView(GenericAPIView, UpdateModelMixin):
                 status=status.HTTP_404_NOT_FOUND,
                 content_type='application/json'
             )
-        except ValueError as e:
-            logger.error(f"Validation error in grade check update: {str(e)}")
-            return HttpResponse(
-                json.dumps({'error': str(e)}),
-                status=status.HTTP_400_BAD_REQUEST,
-                content_type='application/json'
-            )
         except Exception as e:
             logger.error(f"Error updating grade check: {str(e)}")
             return HttpResponse(
@@ -127,18 +136,21 @@ class UpdateGradeCheckView(GenericAPIView, UpdateModelMixin):
             )
 
 class ListGradeChecksView(APIView):
-    """List all grade checks for a repository or student."""
+    """List all grade checks with optional filtering."""
     
     def get(self, request, *args, **kwargs):
         try:
             filters = {}
             username = request.GET.get('username')
             repository = request.GET.get('repository')
+            course_id = request.GET.get('course_id')
 
             if username:
                 filters['student_username'] = username
             if repository:
                 filters['repository_name'] = repository
+            if course_id:
+                filters['course__course_id'] = course_id
 
             grade_checks = GradeCheck.objects.filter(**filters)
             badge_generator = BadgeGenerator()
@@ -172,27 +184,32 @@ class SearchGradeChecksView(APIView):
     
     def post(self, request, *args, **kwargs):
         try:
+            filters = {}
             repository = request.data.get('repository_name')
             username = request.data.get('student_username')
+            course_id = request.data.get('course_id')
 
             if not repository or not username:
                 raise ValueError("Both repository_name and student_username are required")
 
-            grade_check = GradeCheck.objects.get(
-                repository_name=repository,
-                student_username=username
-            )
+            filters.update({
+                'repository_name': repository,
+                'student_username': username
+            })
+
+            if course_id:
+                filters['course__course_id'] = course_id
+
+            grade_check = GradeCheck.objects.filter(**filters).latest('created_at')
             
             badge_generator = BadgeGenerator()
-            badge_url = badge_generator.generate_badge_url(
+            response_data = grade_check.as_dict()
+            response_data['badge_url'] = badge_generator.generate_badge_url(
                 grade_check.repository_name,
                 grade_check.passed_checks,
                 grade_check.total_checks,
                 grade_check.status
             )
-            
-            response_data = grade_check.as_dict()
-            response_data['badge_url'] = badge_url
 
             return HttpResponse(
                 json.dumps(response_data),
@@ -218,17 +235,22 @@ class SearchGradeChecksView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 content_type='application/json'
             )
-        
 
 class GetBadgeView(APIView):
-    """Generate and return badge for specific grade check."""
+    """Get badge for specific grade check."""
     
     def get(self, request, username, repository, *args, **kwargs):
         try:
-            grade_check = GradeCheck.objects.filter(
-                student_username=username,
-                repository_name=repository
-            ).latest('created_at')
+            filters = {
+                'student_username': username,
+                'repository_name': repository
+            }
+
+            course_id = request.GET.get('course_id')
+            if course_id:
+                filters['course__course_id'] = course_id
+
+            grade_check = GradeCheck.objects.filter(**filters).latest('created_at')
             
             badge_generator = BadgeGenerator()
             badge_url = badge_generator.generate_badge_url(
