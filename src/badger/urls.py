@@ -1,9 +1,7 @@
-from django.urls import path, re_path
+from django.urls import path
 from .views import (
     AddGradeCheckView,
-    UpdateGradeCheckView,
-    ListGradeChecksView,
-    SearchGradeChecksView,
+    ListBadgesView,
     GetBadgeView
 )
 
@@ -11,8 +9,6 @@ app_name = 'badger'
 
 urlpatterns = [
     path('add/', AddGradeCheckView.as_view(), name='add-grade'),
-    path('update/', UpdateGradeCheckView.as_view(), name='update-grade'),
-    path('list/', ListGradeChecksView.as_view(), name='list-grades'),
-    path('search/', SearchGradeChecksView.as_view(), name='search-grades'),
-    path('badge/<str:username>/<str:repository>/', GetBadgeView.as_view(), name='get-badge'),
+    path('badges/', ListBadgesView.as_view(), name='list-badges'),
+    path('badge/<str:username>/<str:repository>/<str:badge_name>/', GetBadgeView.as_view(), name='get-badge'),
 ]

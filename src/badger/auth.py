@@ -24,18 +24,21 @@ def verify_github_signature(request):
     request_body = request.body.decode('utf-8')
     
     # Calculate expected signature
-    expected_signature = 'sha256=' + hmac.new(
-        github_secret.encode(),
-        request_body.encode(),
-        hashlib.sha256
-    ).hexdigest()
+    # expected_signature = 'sha256=' + hmac.new(
+    #     github_secret.encode(),
+    #     request_body.encode(),
+    #     hashlib.sha256
+    # ).hexdigest()
+    expected_signature= f"{github_secret}"
+
 
     logger.debug(f"Received signature: {signature}")
     logger.debug(f"Expected signature: {expected_signature}")
     logger.debug(f"Secret used: {github_secret}")
     logger.debug(f"Request body: {request_body}")
 
-    return hmac.compare_digest(signature, expected_signature)
+    return github_secret == signature
+    #return hmac.compare_digest(signature, expected_signature)
 
 def require_github_auth(view_func):
     """Decorator to require GitHub webhook authentication."""

@@ -1,53 +1,47 @@
+# whorl-server/src/badger/models.py
 import pgtrigger
 from django.db import models
 from urllib.parse import quote
+import json
 
-class Course(models.Model):
-    """Course information for badge grouping."""
+class Badge(models.Model):
+    """Model for badge definitions."""
     name = models.CharField(max_length=255)
-    course_id = models.CharField(max_length=50, unique=True)  # e.g., "CS200"
     description = models.TextField(blank=True)
+    total_steps = models.IntegerField(default=1)
+    category = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.course_id}: {self.name}"
+        return f"{self.name} ({self.category})"
 
-@pgtrigger.register(
-    pgtrigger.Trigger(
-        name='update_badge_status',
-        level=pgtrigger.Row,
-        operation=pgtrigger.Update | pgtrigger.Insert,
-        when=pgtrigger.After,
-        func="""
-            BEGIN
-                IF NEW.passed_checks = NEW.total_checks THEN
-                    NEW.status := 'passed';
-                ELSE
-                    NEW.status := 'failed';
-                END IF;
-                RETURN NEW;
-            END;
-        """
-    )
-)
+class BadgeProgress(models.Model):
+    """Model for tracking badge progress."""
+    badge = models.ForeignKey(Badge, on_delete=models.CASCADE)
+    repository_name = models.CharField(max_length=255)
+    student_username = models.CharField(max_length=255)
+    current_step = models.IntegerField(default=0)
+    completed = models.BooleanField(default=False)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ['badge', 'repository_name', 'student_username']
+
+    def __str__(self):
+        return f"{self.badge.name} - {self.student_username} (Step {self.current_step})"
+
 class GradeCheck(models.Model):
-    """Stores grading results and badge status."""
-    # Core fields
+    """Stores grading results and processes GatorGrader output."""
     repository_name = models.CharField(max_length=255)
     student_username = models.CharField(max_length=255)
     workflow_run_id = models.CharField(max_length=255, unique=True)
     commit_hash = models.CharField(max_length=40)
     
-    # Course association
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True)
-    assignment_name = models.CharField(max_length=255, null=True, blank=True)
-    
-    # Check results
+    # GatorGrader results
+    check_details = models.JSONField(default=dict)
     passed_checks = models.IntegerField(default=0)
     total_checks = models.IntegerField(default=0)
-    check_details = models.JSONField(default=dict)
     
-    # Badge status
     status = models.CharField(
         max_length=20,
         choices=[
@@ -58,19 +52,60 @@ class GradeCheck(models.Model):
         default='pending'
     )
     
-    # Workflow metadata
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        indexes = [
-            models.Index(fields=['repository_name', 'student_username']),
-            models.Index(fields=['workflow_run_id']),
-            models.Index(fields=['course', 'student_username'])
-        ]
+    def process_gator_output(self, gator_output):
+        """Process GatorGrader output and update badge progress."""
+        try:
+            # Parse JSON if string
+            if isinstance(gator_output, str):
+                check_results = json.loads(gator_output)
+            else:
+                check_results = gator_output
 
-    def __str__(self):
-        return f"{self.repository_name} - {self.student_username} ({self.status})"
+            total_checks = len(check_results)
+            passed_checks = sum(1 for check in check_results if check.get('status', False))
+
+            # Store check results
+            self.check_details = check_results
+            self.passed_checks = passed_checks
+            self.total_checks = total_checks
+            self.save()
+
+            # Process badges
+            for check in check_results:
+                badges = check.get('badges', [])
+                for badge_info in badges:
+                    badge_name = badge_info.get('name')
+                    step = badge_info.get('step', 1)
+                    category = check.get('category', 'default')
+
+                    # Get or create badge
+                    badge, _ = Badge.objects.get_or_create(
+                        name=badge_name,
+                        defaults={
+                            'category': category,
+                            'description': check.get('description', ''),
+                        }
+                    )
+
+                    # Update badge progress if check passed
+                    if check.get('status', False):
+                        progress, _ = BadgeProgress.objects.get_or_create(
+                            badge=badge,
+                            repository_name=self.repository_name,
+                            student_username=self.student_username,
+                        )
+                        progress.current_step = max(progress.current_step, step)
+                        if progress.current_step >= badge.total_steps:
+                            progress.completed = True
+                        progress.save()
+
+            return True
+        except Exception as e:
+            print(f"Error processing GatorGrader output: {str(e)}")
+            return False
 
     def get_badge_url(self):
         """Generate badge URL based on check results."""
@@ -87,28 +122,10 @@ class GradeCheck(models.Model):
             'student_username': self.student_username,
             'workflow_run_id': self.workflow_run_id,
             'commit_hash': self.commit_hash,
-            'course': self.course.course_id if self.course else None,
-            'assignment_name': self.assignment_name,
             'passed_checks': self.passed_checks,
             'total_checks': self.total_checks,
             'status': self.status,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat(),
             'badge_url': self.get_badge_url()
-        }
-
-    @staticmethod
-    def process_gator_output(grading_output):
-        """Process GatorGrader output into check results."""
-        if not isinstance(grading_output, dict):
-            raise ValueError("Grading output must be a dictionary")
-
-        checks = grading_output.get('checks', [])
-        passed_checks = sum(1 for check in checks if check.get('passed'))
-        total_checks = len(checks)
-
-        return {
-            'passed_checks': passed_checks,
-            'total_checks': total_checks,
-            'details': checks
         }
