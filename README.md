@@ -5,7 +5,7 @@ This README provides instructions for setting up the database, configuring users
 First, clone the repository and navigate to the project directory.
 
 ```bash
-git clone git@github.com:allegheny-college-cmpsc-404-spring-2025/whorl-server.git
+git clone org-184059057@github.com:hellowhorl/whorl-server.git
 ```
 
 ## Setup a Virtual Environment
