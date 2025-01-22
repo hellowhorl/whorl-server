@@ -13,7 +13,7 @@ git clone org-184059057@github.com:hellowhorl/whorl-server.git
 Here you will utilize `venv`, which is short for virtual environment, specific for your client.
 
 1. **Create a Virtual Environment**  
-    - In the root of the `whorl-client` repository, run the following command:
+    - In the root of the `whorl-server` repository, run the following command:
 
       ```bash
       python -m venv .venv
