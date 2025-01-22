@@ -54,7 +54,6 @@ python -m pip install -e .
         brew services start postgresql
       ```
 
-
 ## Database Setup
 
 1. **Create the Database**  
