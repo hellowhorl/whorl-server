@@ -47,6 +47,13 @@ python -m pip install -e .
      psql postgres
      ```
 
+3. **Start the services**
+    - Start the PostgreSQL service:
+
+      ```bash
+        brew services start postgresql
+      ```
+
 
 ## Database Setup
 
@@ -67,18 +74,18 @@ python -m pip install -e .
     PS: 'user' doesn't need quotes, but 'password' does.
 
 3. **Grant User Permissions**  
-   - Grant all privileges on the `api` database to the `lethe` user:  
+   - Grant all privileges on the `api` database to the user:  
 
     ```sql
-    GRANT ALL PRIVILEGES ON DATABASE "api" TO lethe;
+    GRANT ALL PRIVILEGES ON DATABASE "api" TO <user>;
     ```
 
 4. **Verify Ownership**  
-   - Use the `\l` command to list databases and check if `lethe` owns the `api` database.  
+   - Use the `\l` command to list databases and check if user owns the `api` database.  
    - If not, update the owner with this command:
 
      ```sql
-     ALTER DATABASE "api" OWNER TO lethe;
+     ALTER DATABASE "api" OWNER TO <user>;
      ```
 
 5. **Exit the PostgreSQL Shell**  
