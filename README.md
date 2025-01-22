@@ -58,34 +58,34 @@ python -m pip install -e .
 ## Database Setup
 
 1. **Create the Database**  
-   - Run the following SQL command to create the `api` database:
+   - Run the following SQL command to create the `<database>` database:
 
      ```sql
-     CREATE DATABASE "api";
+     CREATE DATABASE "<database>";
      ```
 
 2. **Create the User**
     - Run the following SQL command to create the user with password (reference the .env file for the password):
 
         ```sql
-        CREATE USER 'user' WITH PASSWORD 'password';
+        CREATE USER 'user' WITH PASSWORD '<password>';
         ```
 
     PS: 'user' doesn't need quotes, but 'password' does.
 
 3. **Grant User Permissions**  
-   - Grant all privileges on the `api` database to the user:  
+   - Grant all privileges on the `<database>` database to the user:  
 
     ```sql
-    GRANT ALL PRIVILEGES ON DATABASE "api" TO <user>;
+    GRANT ALL PRIVILEGES ON DATABASE "<database>" TO <user>;
     ```
 
 4. **Verify Ownership**  
-   - Use the `\l` command to list databases and check if user owns the `api` database.  
+   - Use the `\l` command to list databases and check if user owns the `<database>` database.  
    - If not, update the owner with this command:
 
      ```sql
-     ALTER DATABASE "api" OWNER TO <user>;
+     ALTER DATABASE "<database>" OWNER TO <user>;
      ```
 
 5. **Exit the PostgreSQL Shell**  
