@@ -36,17 +36,16 @@ python -m pip install -e .
 
 ## Keys and Environment Variables
 
-If you are part of the `whorl` organization, you can find the keys in the `.env` file. If you are not, you can create your own `.env` file in the root of the `whorl-server` repository.  
-
+If you are part of the `whorl` organization, you can find the keys in the `.env` file. If you are not, you can create your own `.env` file in the root of the `whorl-server` repository.
 - The `.env` file should contain the following variables:
 
      ```plaintext
      
       API_URL=localhost
       API_DB_HOST=localhost
-      API_DB_USER=<your_api_db_user_name>
-      API_DB_PASS=<your_api_db_pass>
-      API_HOST=<your_api_host>
+      API_DB_USER=your_api_db_user_name
+      API_DB_PASS=your_api_db_pass
+      API_HOST=your_api_host
 
       OPEN_AI_KEY=<your_openai_key>
 
