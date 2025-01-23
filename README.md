@@ -47,25 +47,12 @@ python -m pip install -e .
      psql postgres
      ```
 
-## Setting dontenv profile 
+3. **Start the services**
+    - Start the PostgreSQL service:
 
-1. **setup dontenv service**
-
-   - If you are part of the organization you should make sure your env file looks like 
-
-'''bash 
-API_URL=localhost
-API_DB_HOST=localhost
-API_DB_USER=username
-API_DB_PASS='your password'
-API_HOST=127.0.0.1
-
-OPEN_AI_KEY=<Your OPEN AI Key>
-
-OPENWEATHER_API=99de958771535996d27b9b2f2678661f
-OPENWEATHER_LAT=user current location 
-OPENWEATHER_LON=user current location
-'''
+      ```bash
+        brew services start postgresql
+      ```
 
 ## Database Setup
 
@@ -77,7 +64,7 @@ OPENWEATHER_LON=user current location
      ```
 
 2. **Create the User**
-    - Run the following SQL command to create the user with password (reference the .env file for the password):
+    - Run the following SQL command to create the user with password (reference the `.env file` for the password):
 
         ```sql
         CREATE USER 'user' WITH PASSWORD '<password>';
@@ -132,3 +119,5 @@ OPENWEATHER_LON=user current location
      ```bash
      climate
      ```
+
+

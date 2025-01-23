@@ -333,3 +333,8 @@ cython_debug/
 
 # Nano SAVE files
 *.save*
+
+.env*
+.flaskenv*
+!.env.project
+!.env.vault
