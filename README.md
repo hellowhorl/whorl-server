@@ -34,31 +34,32 @@ Once your virtual environment is set up, perform a development install by runnin
 python -m pip install -e .
 ```
 
+## Keys and Environment Variables
+
+If you are part of the `whorl` organization, you can find the keys in the `.env` file. If you are not, you can create your own `.env` file in the root of the `whorl-server` repository.  
+
+- The `.env` file should contain the following variables:
+
+     ```plaintext
+     
+      API_URL=localhost
+      API_DB_HOST=localhost
+      API_DB_USER=<your_api_db_user_name>
+      API_DB_PASS=<your_api_db_pass>
+      API_HOST=<your_api_host>
+
+      OPEN_AI_KEY=<your_openai_key>
+
+      OPENWEATHER_API=<your_openweather_key>
+      OPENWEATHER_LAT=<your_openweather_latitude>
+      OPENWEATHER_LON=<your_openweather_longitude>
+     ```
+
 ## PostgreSQL Setup
 
 1. **Install PostgreSQL**  
    - Make sure PostgreSQL is installed on your machine.  
    - If not installed, you can download it from [PostgreSQL Downloads](https://www.postgresql.org/download/) and follow the installation instructions for your operating system.
-
-## Setting dontenv profile 
-
-1. **setup dontenv service**
-
-   - If you are part of the organization you should make sure your env file looks like 
-
-'''bash 
-API_URL=localhost
-API_DB_HOST=localhost
-API_DB_USER=username
-API_DB_PASS='your password'
-API_HOST=127.0.0.1
-
-OPEN_AI_KEY=<Your OPEN AI Key>
-
-OPENWEATHER_API=99de958771535996d27b9b2f2678661f
-OPENWEATHER_LAT=user current location 
-OPENWEATHER_LON=user current location
-'''
 
 2. **Access the PostgreSQL Shell**  
    - Open a terminal and log into the PostgreSQL shell:  
