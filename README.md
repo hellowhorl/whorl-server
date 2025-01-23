@@ -139,5 +139,3 @@ If you are part of the `whorl` organization, you can find the keys in the `.env`
      ```bash
      climate
      ```
-
-
