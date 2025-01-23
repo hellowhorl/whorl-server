@@ -40,6 +40,26 @@ python -m pip install -e .
    - Make sure PostgreSQL is installed on your machine.  
    - If not installed, you can download it from [PostgreSQL Downloads](https://www.postgresql.org/download/) and follow the installation instructions for your operating system.
 
+## Setting dontenv profile 
+
+1. **setup dontenv service**
+
+   - If you are part of the organization you should make sure your env file looks like 
+
+'''bash 
+API_URL=localhost
+API_DB_HOST=localhost
+API_DB_USER=username
+API_DB_PASS='your password'
+API_HOST=127.0.0.1
+
+OPEN_AI_KEY=<Your OPEN AI Key>
+
+OPENWEATHER_API=99de958771535996d27b9b2f2678661f
+OPENWEATHER_LAT=user current location 
+OPENWEATHER_LON=user current location
+'''
+
 2. **Access the PostgreSQL Shell**  
    - Open a terminal and log into the PostgreSQL shell:  
 
