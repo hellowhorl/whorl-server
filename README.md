@@ -43,9 +43,9 @@ If you are part of the `whorl` organization, you can find the keys in the `.env`
      ```plaintext
       API_URL=localhost
       API_DB_HOST=localhost
-      API_DB_USER=your_api_db_user_name
-      API_DB_PASS=your_api_db_pass
-      API_HOST=your_api_host
+      API_DB_USER=<your_api_db_user_name>
+      API_DB_PASS=<your_api_db_pass>
+      API_HOST=<your_api_host>
 
       OPEN_AI_KEY=<your_openai_key>
 
