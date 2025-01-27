@@ -60,7 +60,7 @@ If you are part of the `whorl` organization, you can find the keys in the `.env`
    - Make sure PostgreSQL is installed on your machine.  
    - If not installed, you can download it from [PostgreSQL Downloads](https://www.postgresql.org/download/) and follow the installation instructions for your operating system.
 
-### Mac
+### MacOS
 
 1. **Access the PostgreSQL Shell**  
    - Open a terminal and log into the PostgreSQL shell:  
@@ -77,7 +77,6 @@ If you are part of the `whorl` organization, you can find the keys in the `.env`
       ```
 
 ### Linux
-
 
 ### Windows
 
