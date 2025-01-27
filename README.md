@@ -60,19 +60,26 @@ If you are part of the `whorl` organization, you can find the keys in the `.env`
    - Make sure PostgreSQL is installed on your machine.  
    - If not installed, you can download it from [PostgreSQL Downloads](https://www.postgresql.org/download/) and follow the installation instructions for your operating system.
 
-2. **Access the PostgreSQL Shell**  
+### Mac
+
+1. **Access the PostgreSQL Shell**  
    - Open a terminal and log into the PostgreSQL shell:  
 
      ```bash
      psql postgres
      ```
 
-3. **Start the services**
+2. **Start the services**
     - Start the PostgreSQL service:
 
       ```bash
         brew services start postgresql
       ```
+
+### Linux
+
+
+### Windows
 
 ## Database Setup
 
