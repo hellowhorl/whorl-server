@@ -100,7 +100,8 @@ If you are part of the `whorl` organization, you can find the keys in the `.env`
    - navigate to the PostgreSQL bin directory (e.g., C:\Program Files\PostgreSQL\<version>\bin).
    - log into the PostgreSQL shell:   
      
-     ```psql -U postgres
+     ```sudo
+      psql -U postgres
      ```
 2. **Start the services**
   - Start the PostgreSQL service using the Services Manager:
@@ -114,7 +115,9 @@ If you are part of the `whorl` organization, you can find the keys in the `.env`
     start postgresql-x64-<version>
     ```
   - replace <version> with the installed PostgreSQL version (e.g., 15 for PostgreSQL 15).
+  
   - to stop the service: 
+    
     ```net
       stop postgresql-x64-<version>
     ```
