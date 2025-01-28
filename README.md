@@ -77,9 +77,47 @@ If you are part of the `whorl` organization, you can find the keys in the `.env`
       ```
 
 ### Linux
+1. **Access the PostgreSQL Shell**  
+   - Open a terminal and log into the PostgreSQL shell:  
 
+     ```sudo -i -u postgres
+     psql
+     ```
+2. **Start the services**
+    - Start the PostgreSQL service:
+
+      ```sudo
+        systemctl start postgresql
+      ```
+    - to check status of the service: 
+
+      ```sudo
+        systemctl status postgresql
+      ```
 ### Windows
+1. **Access the PostgreSQL Shell**  
+   - Open a terminal and log into the PostgreSQL shell:
+   - navigate to the PostgreSQL bin directory (e.g., C:\Program Files\PostgreSQL\<version>\bin).
+   - log into the PostgreSQL shell:   
+     
+     ```psql -U postgres
+     ```
+2. **Start the services**
+  - Start the PostgreSQL service using the Services Manager:
+  - press Win + R, type services.msc, and press Enter.
+  - Locate the PostgreSQL service in the list.
+  - Right-click on it and choose start.
 
+  - If wanted to run alternatively you can start the service in the terminal using the command Prompt: 
+  
+  ```net
+    start postgresql-x64-<version>
+    ```
+  - replace <version> with the installed PostgreSQL version (e.g., 15 for PostgreSQL 15).
+  - to stop the service: 
+  ```net
+    stop postgresql-x64-<version>
+  ```
 ## Database Setup
 
 1. **Create the Database**  
