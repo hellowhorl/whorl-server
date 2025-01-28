@@ -80,8 +80,8 @@ If you are part of the `whorl` organization, you can find the keys in the `.env`
 1. **Access the PostgreSQL Shell**  
    - Open a terminal and log into the PostgreSQL shell:  
 
-     ```sudo -i -u postgres
-     psql
+     ```sudo 
+     -i -u postgres psql
      ```
 2. **Start the services**
     - Start the PostgreSQL service:
