@@ -110,14 +110,14 @@ If you are part of the `whorl` organization, you can find the keys in the `.env`
 
   - If wanted to run alternatively you can start the service in the terminal using the command Prompt: 
   
-  ```net
+    ```net
     start postgresql-x64-<version>
     ```
   - replace <version> with the installed PostgreSQL version (e.g., 15 for PostgreSQL 15).
   - to stop the service: 
-  ```net
-    stop postgresql-x64-<version>
-  ```
+    ```net
+      stop postgresql-x64-<version>
+    ```
 ## Database Setup
 
 1. **Create the Database**  
