@@ -61,7 +61,6 @@ If you are part of the `whorl` organization, you can find the keys in the `.env`
    - If not installed, you can download it from [PostgreSQL Downloads](https://www.postgresql.org/download/) and follow the installation instructions for your operating system.
 
 ### MacOS
-
 1. **Access the PostgreSQL Shell**  
    - Open a terminal and log into the PostgreSQL shell:  
 
@@ -75,6 +74,11 @@ If you are part of the `whorl` organization, you can find the keys in the `.env`
       ```bash
         brew services start postgresql
       ```
+    - to stop the PostgreSQL service 
+      
+      ```bash 
+        brew services stop postgresql 
+      ```
 
 ### Linux
 1. **Access the PostgreSQL Shell**  
@@ -83,6 +87,7 @@ If you are part of the `whorl` organization, you can find the keys in the `.env`
      ```sudo 
      -i -u postgres psql
      ```
+
 2. **Start the services**
     - Start the PostgreSQL service:
 
@@ -93,6 +98,10 @@ If you are part of the `whorl` organization, you can find the keys in the `.env`
 
       ```sudo
         systemctl status postgresql
+      ```
+    - to stop the service: 
+      ```sudo
+        systemctl stop postgresql
       ```
 ### Windows
 1. **Access the PostgreSQL Shell**  
