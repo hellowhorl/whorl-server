@@ -61,34 +61,29 @@ If you are part of the `whorl` organization, you can find the keys in the `.env`
    - If not installed, you can download it from [PostgreSQL Downloads](https://www.postgresql.org/download/) and follow the installation instructions for your operating system.
 
 ### MacOS
-1. **Access the PostgreSQL Shell**  
+1. **Start the services**
+    - Start the PostgreSQL service:
+
+      ```bash
+        brew services start postgresql
+      ```
+
+2. **Access the PostgreSQL Shell**  
    - Open a terminal and log into the PostgreSQL shell:  
 
      ```bash
      psql postgres
      ```
 
-2. **Start the services**
-    - Start the PostgreSQL service:
-
-      ```bash
-        brew services start postgresql
-      ```
-    - to stop the PostgreSQL service 
+3.  **To stop the service**
+  - to stop the PostgreSQL service 
       
       ```bash 
         brew services stop postgresql 
       ```
 
 ### Linux
-1. **Access the PostgreSQL Shell**  
-   - Open a terminal and log into the PostgreSQL shell:  
-
-     ```sudo 
-     -i -u postgres psql
-     ```
-
-2. **Start the services**
+1. **Start the services**
     - Start the PostgreSQL service:
 
       ```sudo
@@ -101,18 +96,17 @@ If you are part of the `whorl` organization, you can find the keys in the `.env`
       ```
     - to stop the service: 
       ```sudo
-        systemctl stop postgresql
-      ```
-### Windows
-1. **Access the PostgreSQL Shell**  
-   - Open a terminal and log into the PostgreSQL shell:
-   - navigate to the PostgreSQL bin directory (e.g., C:\Program Files\PostgreSQL\<version>\bin).
-   - log into the PostgreSQL shell:   
-     
-     ```sudo
-      psql -U postgres
+        sys
+
+2. **Access the PostgreSQL Shell**  
+   - Open a terminal and log into the PostgreSQL shell:  
+
+     ```sudo 
+     -i -u postgres psql
      ```
-2. **Start the services**
+
+### Windows
+1. **Start the services**
   - Start the PostgreSQL service using the Services Manager:
   - press Win + R, type services.msc, and press Enter.
   - Locate the PostgreSQL service in the list.
@@ -123,8 +117,17 @@ If you are part of the `whorl` organization, you can find the keys in the `.env`
     ```net
     start postgresql-x64-<version>
     ```
-  - replace <version> with the installed PostgreSQL version (e.g., 15 for PostgreSQL 15).
-  
+
+2. **Access the PostgreSQL Shell**  
+   - Open a terminal and log into the PostgreSQL shell:
+   - navigate to the PostgreSQL bin directory (e.g., C:\Program Files\PostgreSQL\<version>\bin).
+   - log into the PostgreSQL shell:   
+     
+     ```sudo
+      psql -U postgres
+     ```
+     
+3. **to stop the service**
   - to stop the service: 
     
     ```net
