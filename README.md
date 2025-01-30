@@ -132,14 +132,17 @@ If you are part of the `whorl` organization, you can find the keys in the `.env`
     ```
 ## Database Setup
 
-1. **Create the Database**  
+1. **make sure PostgreSQL shell is running**
+  - Make sure you do the above instrsuctions because none of the database steps are doable without a PostgreSQL shell
+
+2. **Create the Database**  
    - Run the following SQL command to create the `<database>` database:
 
      ```sql
      CREATE DATABASE "<database>";
      ```
 
-2. **Create the User**
+3. **Create the User**
     - Run the following SQL command to create the user with password (reference the `.env file` for the password):
 
         ```sql
@@ -148,14 +151,14 @@ If you are part of the `whorl` organization, you can find the keys in the `.env`
 
     PS: 'user' doesn't need quotes, but 'password' does.
 
-3. **Grant User Permissions**  
+4. **Grant User Permissions**  
    - Grant all privileges on the `<database>` database to the user:  
 
     ```sql
     GRANT ALL PRIVILEGES ON DATABASE "<database>" TO <user>;
     ```
 
-4. **Verify Ownership**  
+5. **Verify Ownership**  
    - Use the `\l` command to list databases and check if user owns the `<database>` database.  
    - If not, update the owner with this command:
 
@@ -163,7 +166,7 @@ If you are part of the `whorl` organization, you can find the keys in the `.env`
      ALTER DATABASE "<database>" OWNER TO <user>;
      ```
 
-5. **Exit the PostgreSQL Shell**  
+6. **Exit the PostgreSQL Shell**  
    - Type `\q` to exit.
 
 ## Test if client and server are connected
