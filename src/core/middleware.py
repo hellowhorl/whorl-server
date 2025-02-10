@@ -20,7 +20,7 @@ class GitHubTokenAuthenticationMiddleware:
         return response
 
     def validate_github_token(self, token):
-        headers = {'Authorization': f'token {token}'}
+        headers = {'Authorization': token}
         response = requests.get('https://api.github.com/user', headers=headers)
         return response.status_code == 200
     
