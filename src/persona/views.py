@@ -212,3 +212,29 @@ class PersonaCreateView(APIView):
             status = 200
         )
 
+class PersonaThreadManagementView(APIView):
+
+    def get(self, request, thread_id, *args, **kwargs):
+        runs = client.beta.threads.runs.list(
+            thread_id = thread_id
+        )
+        for run in runs:
+            try:
+                canceled = client.beta.threads.run.cancel(
+                    thread_id = thread_id,
+                    run_id = run.id
+                )
+            except:
+                pass
+        return HttpResponse(
+            status = 200
+        )
+
+    def delete(self, request, thread_id, *args, **kwargs):
+        thread = PersonaThreadModel.objects.get(
+            thread_id = thread_id
+        )
+        thread.delete()
+        return HttpResponse(
+            status = 200
+        )
