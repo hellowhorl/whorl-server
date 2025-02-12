@@ -31,6 +31,6 @@ class GitHubTokenAuthenticationMiddleware:
                 return response
             else:
                 # User is not authenticated
-                return user_response
+                return JsonResponse({"detail": "Forbidden"}, status=403)
         else:
-            return user_response
+            return JsonResponse({"detail": "Forbidden"}, status=403)
