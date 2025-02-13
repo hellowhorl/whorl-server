@@ -166,6 +166,8 @@ class ProcessGatorOutputView(APIView):
     
     def post(self, request, *args, **kwargs):
         try:
+            # Print incoming data for debugging
+            print("Received data:", request.data)
             data = {
                 'repository_name': request.data.get('repository_name'),
                 'student_username': request.data.get('student_username'),

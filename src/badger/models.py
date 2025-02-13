@@ -2,13 +2,18 @@ import pgtrigger
 from django.db import models
 from django.core.exceptions import ValidationError
 import json
+import logging
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class Badge(models.Model):
     """Canonical badge definitions."""
-    badge_id = models.CharField(max_length=50, unique=True, default="BADGE_DEFAULT")  # e.g., "UNIX_01"
-    name = models.CharField(max_length=255)  # e.g., "Command Line Ninja"
+    badge_id = models.CharField(max_length=50, unique=True, default="BADGE_DEFAULT")
+    name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    category = models.CharField(max_length=255)  # e.g., "git", "unix", etc.
+    category = models.CharField(max_length=255)
     total_steps = models.IntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -18,6 +23,21 @@ class Badge(models.Model):
     def clean(self):
         if not self.badge_id.isalnum():
             raise ValidationError("Badge ID must be alphanumeric")
+
+    @staticmethod  # Changed from classmethod to staticmethod since we don't need cls
+    def get_or_create_badge(name, category, steps=1, description=""):
+        """Get existing badge or create a new one."""
+        badge_id = f"{category.upper()}_{name.upper().replace(' ', '_')}"
+        badge, created = Badge.objects.get_or_create(
+            badge_id=badge_id,
+            defaults={
+                'name': name,
+                'category': category,
+                'total_steps': steps,
+                'description': description
+            }
+        )
+        return badge
 
 class BadgeProgress(models.Model):
     """Tracks user progress towards badges."""
@@ -107,6 +127,7 @@ class GatorCheck(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    
     def process_gator_output(self, gator_output):
         """Process GatorGrader output and update badge progress."""
         try:
@@ -115,6 +136,9 @@ class GatorCheck(models.Model):
                 check_results = json.loads(gator_output)
             else:
                 check_results = gator_output
+                
+            if not isinstance(check_results, list):
+                check_results = [check_results]
 
             self.check_details = check_results
             self.total_checks = len(check_results)
@@ -122,6 +146,8 @@ class GatorCheck(models.Model):
 
             # Process each check
             for check in check_results:
+                logger.debug(f"Processing check: {check}")  # Add debug logging
+                
                 if check.get('status', False):
                     self.passed_checks += 1
                 
@@ -136,28 +162,41 @@ class GatorCheck(models.Model):
                     if not badge_name:
                         continue
 
-                    # Get badge record
-                    badge = Badge.objects.get(name=badge_name)
+                    logger.debug(f"Processing badge: {badge_name}, category: {category}, step: {step}")  # Add debug logging
 
-                    # Get or create progress record
-                    progress, created = BadgeProgress.objects.get_or_create(
-                        badge=badge,
-                        repository_name=self.repository_name,
-                        student_username=self.student_username
-                    )
+                    try:
+                        # Get or create badge record
+                        badge = Badge.get_or_create_badge(
+                            name=badge_name,
+                            category=category,
+                            steps=max(step, 1)
+                        )
 
-                    # Initialize steps if new record
-                    if created:
-                        progress.initialize_steps()
+                        # Get or create progress record
+                        progress, created = BadgeProgress.objects.get_or_create(
+                            badge=badge,
+                            repository_name=self.repository_name,
+                            student_username=self.student_username
+                        )
 
-                    # Update step status
-                    progress.update_step(step, check.get('status', False))
+                        # Initialize steps if new record
+                        if created:
+                            progress.initialize_steps()
+
+                        # Update step status
+                        progress.update_step(step, check.get('status', False))
+                        
+                        logger.debug(f"Successfully processed badge {badge_name}")  # Add debug logging
+                        
+                    except Exception as e:
+                        logger.error(f"Error processing badge {badge_name}: {str(e)}")
+                        continue
 
             self.save()
             return True
 
         except Exception as e:
-            print(f"Error processing GatorGrader output: {str(e)}")
+            logger.error(f"Error processing GatorGrader output: {str(e)}")
             return False
 
     def as_dict(self):
