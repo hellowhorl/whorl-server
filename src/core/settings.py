@@ -17,6 +17,7 @@ ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     "dev.chomp.rs",
+    "cooking.chomp.rs",
     os.getenv("API_URL")
 ]
 
