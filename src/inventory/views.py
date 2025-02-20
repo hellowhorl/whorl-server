@@ -91,6 +91,7 @@ class DropInventoryView(APIView):
     def post(self, request, *args, **kwargs):
         logger.debug("DropInventoryView POST request data: %s", request.data)
         item_name = request.data.get('item_name')
+        item_owner = request.data.get('item_owner')
         # TODO: Theoretically, as a foreign key, we should be able to page through
         #       inventory objects by name and read the foreign key data? Revisit.
         item_owner_record = omnipresence.models.OmnipresenceModel.objects.get(
@@ -173,7 +174,7 @@ class GiveInventoryView(GenericAPIView, UpdateModelMixin):
             item_receiver_record = omnipresence.models.OmnipresenceModel.objects.get(
                 charname = to_charname
             )
-        except OmnipresenceModel.DoesNotExist:
+        except omnipresence.models.OmnipresenceModel.DoesNotExist:
             return HttpResponse(
                 status = 400
             )
