@@ -104,7 +104,7 @@ class DropInventoryView(APIView):
         try:
             inventory_item = Inventory.objects.get(
                 item_name = item_name,
-                item_owner_id = item_owner
+                item_owner_id = getattr(item_owner_record, 'id')
             )
             qty = getattr(inventory_item, 'item_qty')
             setattr(inventory_item, 'item_qty', qty - 1)
