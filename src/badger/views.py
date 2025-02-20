@@ -166,37 +166,62 @@ class ProcessGatorOutputView(APIView):
     
     def post(self, request, *args, **kwargs):
         try:
-            # Print incoming data for debugging
-            print("Received data:", request.data)
-            data = {
-                'repository_name': request.data.get('repository_name'),
-                'student_username': request.data.get('student_username'),
-                'workflow_run_id': request.data.get('workflow_run_id'),
-                'commit_hash': request.data.get('commit_hash')
-            }
+            # Extract data from request, handling both direct and nested formats
+            if 'data' in request.data:
+                data = request.data['data']
+            else:
+                data = request.data
 
-            if not all(data.values()):
+            required_fields = ['repository_name', 'username', 'workflow_run_id', 'commit_hash', 'grading_output']
+            if not all(field in data for field in required_fields):
                 return HttpResponse(
                     json.dumps({'error': 'Missing required fields'}),
                     status=status.HTTP_400_BAD_REQUEST,
                     content_type='application/json'
                 )
 
-            gator_check = GatorCheck.objects.create(**data)
-            success = gator_check.process_gator_output(request.data.get('grading_output', {}))
+            # Create GatorCheck record
+            gator_check = GatorCheck.objects.create(
+                repository_name=data['repository_name'],
+                student_username=data['username'],  # Note: changed from student_username to username
+                workflow_run_id=data['workflow_run_id'],
+                commit_hash=data['commit_hash']
+            )
 
-            if not success:
-                return HttpResponse(
-                    json.dumps({'error': 'Failed to process GatorGrader output'}),
-                    status=status.HTTP_400_BAD_REQUEST,
-                    content_type='application/json'
+            # Process each badge step
+            grading_output = data['grading_output']
+            for check in grading_output:
+                # Create or get badge
+                badge = Badge.get_or_create_badge(
+                    name=check['name'],
+                    category=check.get('category', 'default')
                 )
+
+                # Get or create progress record
+                progress, created = BadgeProgress.objects.get_or_create(
+                    badge=badge,
+                    repository_name=data['repository_name'],
+                    student_username=data['username']
+                )
+
+                if created:
+                    progress.initialize_steps()
+
+                # Update step status
+                progress.update_step(check['step'], True)
+
+            # Update GatorCheck status
+            gator_check.check_details = grading_output
+            gator_check.passed_checks = len(grading_output)
+            gator_check.total_checks = len(grading_output)
+            gator_check.save()
 
             return HttpResponse(
                 json.dumps(gator_check.as_dict()),
                 status=status.HTTP_201_CREATED,
                 content_type='application/json'
             )
+
         except Exception as e:
             logger.error(f"Error processing GatorGrader output: {str(e)}")
             return HttpResponse(
