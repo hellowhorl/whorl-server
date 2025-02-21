@@ -100,46 +100,76 @@ class SyncPersonaGenerateView(APIView):
             setattr(interaction, 'thread_id', thread.id)
             interaction.save()
         thread_id = getattr(interaction, 'thread_id')
-        message = client.beta.threads.messages.create(
-            thread_id = thread_id,
+        # send user message
+        client.beta.threads.messages.create(
+            thread_id=thread_id,
             role="user",
-            content= request.data.get('message')
+            content=request.data.get('message')
         )
+        # start the run
         run = client.beta.threads.runs.create_and_poll(
-            thread_id = thread_id,
-            assistant_id = getattr(assistant, 'assistant_id'),
-            # TODO: Add trigger for tool_choice: {type: "file_search"}
-            #       if flag is set in Ego, transmit
+            thread_id=thread_id,
+            assistant_id=assistant.assistant_id
         )
-        while run.status != 'completed':
-            pass
+        while run.status not in ['completed', 'failed', 'cancelled']:
+            print(f"Run status: {run.status}")
+
+            if run.status == "requires_action" and run.required_action:
+                try:
+                    # extract the tool calls from the required action
+                    tool_calls = run.required_action.submit_tool_outputs.tool_calls
+
+                    # simulate tool execution
+                    tool_outputs = []
+                    for tool in tool_calls:
+                        function_name = tool.function.name
+                        function_args = json.loads(tool.function.arguments)
+
+                        print(f"Executing tool function: {function_name} with args {function_args}")
+
+                        # simulate function execution
+                        output = {"result": f"Executed {function_name} with args {function_args}"}
+                        
+                        tool_outputs.append({"tool_call_id": tool.id, "output": json.dumps(output)})
+
+                    # submit the tool outputs back to continue processing
+                    run = client.beta.threads.runs.submit_tool_outputs(
+                        thread_id=thread_id,
+                        run_id=run.id,
+                        tool_outputs=tool_outputs
+                    )
+
+                except Exception as e:
+                    print(f"error handling tool execution: {e}")
+                    return HttpResponse(json.dumps({"error": "tool execution failed", "details": str(e)}), status=500)
+            
+            # poll again to get the latest response
+            run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
+
+        # fetch response
         response = client.beta.threads.messages.list(
             thread_id = thread_id,
             limit = 1,
             order = "desc"
         )
+        
         latest = response.data[0].content[0].text.value
         print(response)
+
         file_uri = None
         try:
             files = response.data[0].content[0].text.annotations
             for file in files:
-                file_id = file.file_citation.file_id
-                fh = client.beta.assistants.retrieve(
-                    getattr(assistant, 'assistant_id')
-                )
                 file_uri = file.file_citation.file_id
-                # print(file.file_citation.file_id)
         except Exception as e:
-            print(e)
+            print(f"File processing error: {e}")
+
         data = {
             "response": latest,
             "attachments": json.dumps(file_uri),
         }
-        return HttpResponse(
-            json.dumps(data),
-            status = 200
-        )
+
+        return HttpResponse(json.dumps(data), status=200)
 
 class PersonaSearchView(APIView):
 
