@@ -148,7 +148,7 @@ class SyncPersonaGenerateView(APIView):
                         # simulate function execution
                         output = {"result": f"Executed {function_name} with args {function_args}"}
 
-                        tool_outputs.append({"tool_call_id": tool.id, "output": json.dumps(response.content)})
+                        tool_outputs.append({"tool_call_id": tool.id, "output": json.dumps(response.json())})
 
                     # submit the tool outputs back to continue processing
                     run = client.beta.threads.runs.submit_tool_outputs(
