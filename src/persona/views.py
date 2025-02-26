@@ -1,6 +1,7 @@
 import os
 import io
 import json
+import requests
 
 from openai import OpenAI, AssistantEventHandler
 from django.core import serializers
@@ -130,12 +131,24 @@ class SyncPersonaGenerateView(APIView):
                         function_name = tool.function.name
                         function_args = json.loads(tool.function.arguments)
 
+                        # add / instead of _ and then add a underscore in the front of the function name aswell
+                        function_name = function_name.replace("_", "/")
+                        function_name = f"/{function_name}"
+
+                        # make a GET request to the tool function
+                        response = requests.get(
+                            f"http://localhost:8000{function_name}",
+                            params=function_args,
+                        )
+
+                        print(response.content)
+
                         print(f"Executing tool function: {function_name} with args {function_args}")
 
                         # simulate function execution
                         output = {"result": f"Executed {function_name} with args {function_args}"}
 
-                        tool_outputs.append({"tool_call_id": tool.id, "output": json.dumps(output)})
+                        tool_outputs.append({"tool_call_id": tool.id, "output": json.dumps(response.content)})
 
                     # submit the tool outputs back to continue processing
                     run = client.beta.threads.runs.submit_tool_outputs(
