@@ -98,6 +98,11 @@ class SyncPersonaGenerateView(APIView):
         if created:
             thread = client.beta.threads.create()
             setattr(interaction, 'thread_id', thread.id)
+            client.beta.threads.messages.create(
+                thread_id = getattr(interaction, 'thread_id'),
+                role = "assistant",
+                content = f"Your name is {persona_name}. Refer to yourself as {persona_name}."
+            )
             interaction.save()
         thread_id = getattr(interaction, 'thread_id')
         # send user message
@@ -129,7 +134,7 @@ class SyncPersonaGenerateView(APIView):
 
                         # simulate function execution
                         output = {"result": f"Executed {function_name} with args {function_args}"}
-                        
+
                         tool_outputs.append({"tool_call_id": tool.id, "output": json.dumps(output)})
 
                     # submit the tool outputs back to continue processing
