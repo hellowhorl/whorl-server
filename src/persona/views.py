@@ -135,20 +135,15 @@ class SyncPersonaGenerateView(APIView):
                         function_name = function_name.replace("_", "/")
                         function_name = f"/{function_name}"
 
-                        # i dont think this is right (im sorry)
-                        # check if this is an inventory request
-                        if "inventory" in function_name.lower():
-                            requested_name = function_args.get('name', '').lower()
-                            if requested_name and requested_name != persona_name.lower():
-                                # return a response instead of crashing out
-                                output = {
-                                    "error": "Access denied",
-                                    "message": f"I can only access my own inventory as {persona_name}."
-                                }
-                                tool_outputs.append({"tool_call_id": tool.id, "output": json.dumps(output)})
-                                continue
-
                         try:
+
+                            # i dont think this is right (im sorry)
+                            # check if this is an inventory request
+                            if "inventory" in function_name.lower():
+                                requestor = request.data.get('charname')
+                                if requestor != persona_name.lower():
+                                    raise ForbiddenInventoryError
+
                             # make a GET request to the tool function
                             response = requests.get(
                                 f"http://localhost:8000{function_name}",
@@ -163,6 +158,13 @@ class SyncPersonaGenerateView(APIView):
                             output = {"result": f"Executed {function_name} with args {function_args}"}
 
                             tool_outputs.append({"tool_call_id": tool.id, "output": json.dumps(response.json())})
+
+                        except ForbiddenInventoryError as inv_err:
+                            output = {
+                                "error": "Request failed",
+                                "message": f"Can't access inventories that aren't yours. Address the player as {request.data.get('charname')}."
+                            }
+                            tool_outputs.append({"tool_call_id": tool.id, "output": json.dumps(output)})
 
                         except Exception as req_err:
                             print(f"Request error: {req_err}")
@@ -182,7 +184,7 @@ class SyncPersonaGenerateView(APIView):
                 except Exception as e:
                     print(f"error handling tool execution: {e}")
                     return HttpResponse(json.dumps({"error": "tool execution failed", "details": str(e)}), status=500)
-            
+
             # poll again to get the latest response
             run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
 
@@ -308,3 +310,8 @@ class PersonaThreadManagementView(APIView):
         return HttpResponse(
             status = 200
         )
+
+class ForbiddenInventoryError(Exception):
+
+    def __init__(self, *args):
+        super().__init__(args)
