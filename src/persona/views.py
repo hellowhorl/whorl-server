@@ -135,20 +135,42 @@ class SyncPersonaGenerateView(APIView):
                         function_name = function_name.replace("_", "/")
                         function_name = f"/{function_name}"
 
-                        # make a GET request to the tool function
-                        response = requests.get(
-                            f"http://localhost:8000{function_name}",
-                            params=function_args,
-                        )
+                        # i dont think this is right (im sorry)
+                        # check if this is an inventory request
+                        if "inventory" in function_name.lower():
+                            requested_name = function_args.get('name', '').lower()
+                            if requested_name and requested_name != persona_name.lower():
+                                # return a response instead of crashing out
+                                output = {
+                                    "error": "Access denied",
+                                    "message": f"I can only access my own inventory as {persona_name}."
+                                }
+                                tool_outputs.append({"tool_call_id": tool.id, "output": json.dumps(output)})
+                                continue
 
-                        print(response.content)
+                        try:
+                            # make a GET request to the tool function
+                            response = requests.get(
+                                f"http://localhost:8000{function_name}",
+                                params=function_args,
+                            )
 
-                        print(f"Executing tool function: {function_name} with args {function_args}")
+                            print(response.content)
 
-                        # simulate function execution
-                        output = {"result": f"Executed {function_name} with args {function_args}"}
+                            print(f"Executing tool function: {function_name} with args {function_args}")
 
-                        tool_outputs.append({"tool_call_id": tool.id, "output": json.dumps(response.json())})
+                            # simulate function execution
+                            output = {"result": f"Executed {function_name} with args {function_args}"}
+
+                            tool_outputs.append({"tool_call_id": tool.id, "output": json.dumps(response.json())})
+
+                        except Exception as req_err:
+                            print(f"Request error: {req_err}")
+                            output = {
+                                "error": "Request failed",
+                                "message": "Could not connect."
+                            }
+                            tool_outputs.append({"tool_call_id": tool.id, "output": json.dumps(output)})
 
                     # submit the tool outputs back to continue processing
                     run = client.beta.threads.runs.submit_tool_outputs(
