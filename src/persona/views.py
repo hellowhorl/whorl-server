@@ -118,7 +118,7 @@ class SyncPersonaGenerateView(APIView):
             assistant_id=assistant.assistant_id
         )
         while run.status not in ['completed', 'failed', 'cancelled']:
-            print(f"Run status: {run.status}")
+            # print(f"Run status: {run.status}")
 
             if run.status == "requires_action" and run.required_action:
                 try:
@@ -141,7 +141,7 @@ class SyncPersonaGenerateView(APIView):
                             # check if this is an inventory request
                             if "inventory" in function_name.lower():
                                 requestor = request.data.get('charname')
-                                print(requestor, persona_name)
+                                # print(requestor, persona_name)
                                 if requestor == persona_name.lower():
                                     raise ForbiddenInventoryError
 
@@ -151,9 +151,9 @@ class SyncPersonaGenerateView(APIView):
                                 params=function_args,
                             )
 
-                            print(response.content)
+                            # print(response.content)
 
-                            print(f"Executing tool function: {function_name} with args {function_args}")
+                            # print(f"Executing tool function: {function_name} with args {function_args}")
 
                             # simulate function execution
                             output = {"result": f"Executed {function_name} with args {function_args}"}
@@ -168,7 +168,7 @@ class SyncPersonaGenerateView(APIView):
                             tool_outputs.append({"tool_call_id": tool.id, "output": json.dumps(output)})
 
                         except Exception as req_err:
-                            print(f"Request error: {req_err}")
+                            # print(f"Request error: {req_err}")
                             output = {
                                 "error": "Request failed",
                                 "message": "Could not connect."
@@ -183,7 +183,7 @@ class SyncPersonaGenerateView(APIView):
                     )
 
                 except Exception as e:
-                    print(f"error handling tool execution: {e}")
+                    # print(f"error handling tool execution: {e}")
                     return HttpResponse(json.dumps({"error": "tool execution failed", "details": str(e)}), status=500)
 
             # poll again to get the latest response
@@ -197,7 +197,7 @@ class SyncPersonaGenerateView(APIView):
         )
         
         latest = response.data[0].content[0].text.value
-        print(response)
+        # print(response)
 
         file_uri = None
         try:
