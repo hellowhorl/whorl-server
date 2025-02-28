@@ -141,7 +141,8 @@ class SyncPersonaGenerateView(APIView):
                             # check if this is an inventory request
                             if "inventory" in function_name.lower():
                                 requestor = request.data.get('charname')
-                                if requestor != persona_name.lower():
+                                print(requestor, persona_name)
+                                if requestor == persona_name.lower():
                                     raise ForbiddenInventoryError
 
                             # make a GET request to the tool function
