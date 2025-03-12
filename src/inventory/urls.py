@@ -21,7 +21,7 @@ app_name = 'inventory'
 urlpatterns = [
     path('add/', AddInventoryView.as_view(), name='inventory-add'),  # Route for adding items
     path('reduce/', ReduceInventoryView.as_view(), name = 'inventory-reduce'), # Route for reducing item count
-    path('list', ListInventoryView.as_view(), name='inventory-list'),  # Route for listing all items
+    path('list/', ListInventoryView.as_view(), name='inventory-list'),  # Route for listing all items
     path('search/', SearchInventoryView.as_view(), name = 'inventory-search'), # Route for searching user inventory
     path('transfer/<str:to_charname>', GiveInventoryView.as_view(), name = 'inventory-transfer'), # Route for transferring items
     path('docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),  # Swagger documentation
