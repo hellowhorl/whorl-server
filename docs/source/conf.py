@@ -29,5 +29,29 @@ language = "python"
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = "alabaster"
+html_theme = "furo"
 html_static_path = ["_static"]
+html_theme_options = {
+    "default_dark_mode": True,
+    "dark_css_variables": {
+        # Background colors
+        "color-background-primary": "#202020",  # Main content background
+        "color-background-secondary": "#202020",  # Sidebar background
+        # Text colors
+        "color-foreground-primary": "#ffffff",  # Main text color
+        "color-foreground-secondary": "#e0b027",  # Secondary text color
+        # Link colors
+        "color-brand-primary": "#e2ad2b",  # Primary brand color
+        "color-brand-content": "#e2ad2b",  # Link color
+        "color-link": "#e2ad2b",  # Normal links
+        "color-link-hover": "#CEAFF4",  # Hover state
+        "color-link--visited": "#CEAFF4",  # Visited links
+        # Sidebar colors
+        "color-sidebar-link-text": "#e0b027",  # Sidebar link color
+        "color-sidebar-link-text--top-level": "#e2ad2b",  # Top level sidebar links
+        # API/Code colors
+        "color-api-name": "#e2ad2b",  # Function names
+        "color-api-pre-name": "#e2ad2b",  # Class/module names
+        "color-highlight-on-target": "#56595d",
+    },
+}
