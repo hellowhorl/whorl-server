@@ -3,10 +3,10 @@ Omnipresence
 
 Models
 -------------
-.. automodule:: climate.models
+.. automodule:: omnipresence.models
    :members:
 
 Views
 -------------
-.. automodule:: climate.views
+.. automodule:: omnipresence.views
    :members:

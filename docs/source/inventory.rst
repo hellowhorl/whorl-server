@@ -3,10 +3,10 @@ Inventory
 
 Models
 -------------
-.. automodule:: climate.models
+.. automodule:: inventory.models
    :members:
 
 Views
 -------------
-.. automodule:: climate.views
+.. automodule:: inventory.views
    :members:

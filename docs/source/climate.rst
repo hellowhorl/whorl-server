@@ -3,7 +3,7 @@ Climate
 
 Models
 -------------
-.. automodule:: climate.models.ClimateModelManager
+.. automodule:: climate.models
    :members:
 
 Views
