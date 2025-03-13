@@ -8,8 +8,12 @@
 
 import os
 import sys
+import django
 
 sys.path.insert(0, os.path.abspath("../../src"))
+os.environ["DJANGO_SETTINGS_MODULE"] = "core.settings"
+django.setup()
+
 
 project = "Server Documentation"
 copyright = "2025, Will Wolff, Hemani Alaparthi, Chezka Quinola, Darius Googe"
