@@ -1,12 +1,12 @@
-Climate
+Persona
 ========================
 
 Models
 -------------
-.. automodule:: climate.models
+.. automodule:: persona.models
    :members:
 
 Views
 -------------
-.. automodule:: climate.views
+.. automodule:: persona.views
    :members:
