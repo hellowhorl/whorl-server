@@ -1,12 +1,4 @@
 Climate
-========================
-
-Models
--------------
-.. automodule:: climate.models
-   :members:
-
-Views
--------------
-.. automodule:: climate.views
+------------------------
+.. automodule:: climate.main
    :members:
