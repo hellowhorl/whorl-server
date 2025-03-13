@@ -15,7 +15,14 @@ CACHE = caches["default"]
 # https://stackoverflow.com/questions/9091305/django-models-without-database
 
 class ClimateModelManager(models.Manager):
-
+    """A class to look at the descriptions of objects.
+    
+    This class gets the description of objects and returns 
+    to the user what an object looks like.
+    
+    Attributes:
+        filename (str): define a path to a file
+    """
     api = os.getenv("OPENWEATHER_API")
     lat = os.getenv("OPENWEATHER_LAT")
     lon = os.getenv("OPENWEATHER_LON")
