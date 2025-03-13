@@ -16,7 +16,6 @@ documentation for details.
    :caption: Contents:
 
    climate
-   core
    inventory
    omnipresence
    persona
