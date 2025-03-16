@@ -14,14 +14,21 @@ CACHE = caches["default"]
 #
 # https://stackoverflow.com/questions/9091305/django-models-without-database
 
+
 class ClimateModelManager(models.Manager):
-    """A class to look at the descriptions of objects.
-    
-    This class gets the description of objects and returns 
-    to the user what an object looks like.
-    
+    """
+    A Django model manager that fetches and caches climate data from the OpenWeather API.
+
+    This manager retrieves weather data based on the configured latitude and longitude 
+    and caches the response for a specified duration to minimize API requests.
+
     Attributes:
-        filename (str): define a path to a file
+        :api (str): The OpenWeather API key retrieved from environment variables.
+        :lat (str): The latitude coordinate for the weather query, retrieved from environment variables.
+        :lon (str): The longitude coordinate for the weather query, retrieved from environment variables.
+        :cache_key (str): The key used for caching the weather data.
+        :cache_sentinel (object): A unique object used to detect cache misses.
+        :cache_timeout (int): The duration (in seconds) for which the weather data is cached.
     """
     api = os.getenv("OPENWEATHER_API")
     lat = os.getenv("OPENWEATHER_LAT")
@@ -32,6 +39,17 @@ class ClimateModelManager(models.Manager):
     cache_timeout = 600
 
     def get_queryset(self):
+        """
+        Retrieve the weather data from cache or fetch it from the OpenWeather API if not cached.
+
+        If the cache does not contain the weather data, this method queries the OpenWeather API
+        using the configured latitude, longitude, and API key. The retrieved data is then cached
+        for a specified timeout period.
+
+        :raises requests.exceptions.RequestException: If there is an issue with the API request.
+        :return: A queryset containing a single ClimateModel instance populated with weather data.
+        :rtype: ClimateModelQueryset
+        """
         climate_model_data = CACHE.get(self.cache_key, self.cache_sentinel)
         if climate_model_data is self.cache_sentinel:
             response = requests.get(
