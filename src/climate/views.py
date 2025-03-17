@@ -10,6 +10,7 @@ from rest_framework.permissions import AllowAny
 from climate.models import ClimateModel
 from climate.serializers import ClimateModelSerializer
 
+
 class ClimateDataViewAll(RetrieveAPIView):
     """
     API view to retrieve all climate data records.
@@ -19,8 +20,8 @@ class ClimateDataViewAll(RetrieveAPIView):
     and returns the latest entry in JSON format.
 
     Attributes:
-        permission_classes (list): Allows unrestricted access to the view.
-        serializer_class (ClimateModelSerializer): Defines the serializer for the model.
+        * permission_classes (list): Allows unrestricted access to the view.
+        * serializer_class (ClimateModelSerializer): Defines the serializer for the model.
     """
 
     permission_classes = [AllowAny]
