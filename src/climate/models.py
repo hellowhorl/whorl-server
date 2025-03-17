@@ -40,6 +40,17 @@ class ClimateModelManager(models.Manager):
     cache_timeout = 600
 
     def get_queryset(self):
+        """
+        Retrieve the weather data from cache or fetch it from the OpenWeather API if not cached.
+
+        If the cache does not contain the weather data, this method queries the OpenWeather API
+        using the configured latitude, longitude, and API key. The retrieved data is then cached
+        for a specified timeout period.
+
+        :raises requests.exceptions.RequestException: If there is an issue with the API request.
+        :return: A queryset containing a single ClimateModel instance populated with weather data.
+        :rtype: ClimateModelQueryset
+        """
         climate_model_data = CACHE.get(self.cache_key, self.cache_sentinel)
         if climate_model_data is self.cache_sentinel:
             response = requests.get(
