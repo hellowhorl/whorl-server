@@ -78,6 +78,30 @@ class ClimateModelQueryset(UserList):
 
 
 class ClimateModel(models.Model):
+    """
+    A Django model class representing weather data fetched from the OpenWeather API.
+
+    This model is not managed by the Django's ORM (managed = False) and is used to
+    structure and access weather data retrieved from the OpenWeather API. The data
+    is stored in JSON fields corresponding to various weather attributes.
+
+    Attributes:
+        coord (JSONField): The Geographical coordinates of the location.
+        weather (JSONField): Weather conditions at the location. 
+        base (JSONField): Internal parameter.
+        main (JSONField): Main weather data (temperature, pressure, humidity, etc.).
+        visibility (JSONField): Visibility information.
+        wind (JSONField): Wind Conditions.
+        rain (JSONField): Rain information.
+        clouds (JSONField) Cloudiness information. 
+        dt (JSONField): data receiving time in unix format.
+        sys (JSONField): System information.
+        timezone (JSONField): Timezone information.
+        name (JSONField): City name.
+        cod (JSONField): Internal parameter.
+    Methods: 
+        :as_dict: Returns the model data as a dictionary
+    """
     class Meta:
         managed = False
 
