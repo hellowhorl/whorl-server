@@ -15,7 +15,7 @@ os.environ["DJANGO_SETTINGS_MODULE"] = "core.settings"
 django.setup()
 
 
-project = "Server Documentation"
+project = "whorl-server"
 copyright = "2025, Will Wolff, Hemani Alaparthi, Chezka Quinola, Darius Googe"
 author = "Will Wolff, Hemani Alaparthi, Chezka Quinola, Darius Googe"
 release = "0.0.1"
