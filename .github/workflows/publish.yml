@@ -24,7 +24,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install --only-upgrade python3-pip
           sudo python -m venv .venv
-          sudo activate .venv/bin/activate
+          sudo source .venv/bin/activate
           sudo python -m pip install -e .
           sudo python -m pip install -r docs/requirements.txt
           cd docs && make html
