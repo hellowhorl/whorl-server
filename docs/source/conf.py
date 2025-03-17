@@ -18,7 +18,7 @@ django.setup()
 project = "whorl-server"
 copyright = "2025, Will Wolff, Hemani Alaparthi, Chezka Quinola, Darius Googe"
 author = "Will Wolff, Hemani Alaparthi, Chezka Quinola, Darius Googe"
-release = "0.0.1"
+release = "0.0.6"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
