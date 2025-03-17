@@ -23,12 +23,12 @@ class ClimateModelManager(models.Manager):
     and caches the response for a specified duration to minimize API requests.
 
     Attributes:
-    :api (str): The OpenWeather API key retrieved from environment variables.
-    :lat (str): The latitude coordinate for the weather query, retrieved from environment variables.
-    :lon (str): The longitude coordinate for the weather query, retrieved from environment variables.
-    :cache_key (str): The key used for caching the weather data.
-    :cache_sentinel (object): A unique object used to detect cache misses.
-    :cache_timeout (int): The duration (in seconds) for which the weather data is cached.
+        * :api (str): The OpenWeather API key retrieved from environment variables.
+        * :lat (str): The latitude coordinate for the weather query, retrieved from environment variables.
+        * :lon (str): The longitude coordinate for the weather query, retrieved from environment variables.
+        * :cache_key (str): The key used for caching the weather data.
+        * :cache_sentinel (object): A unique object used to detect cache misses.
+        * :cache_timeout (int): The duration (in seconds) for which the weather data is cached.
     """
 
     api = os.getenv("OPENWEATHER_API")
@@ -47,9 +47,9 @@ class ClimateModelManager(models.Manager):
         using the configured latitude, longitude, and API key. The retrieved data is then cached
         for a specified timeout period.
 
-        :raises requests.exceptions.RequestException: If there is an issue with the API request.
-        :return: A queryset containing a single ClimateModel instance populated with weather data.
-        :rtype: ClimateModelQueryset
+        * :raises requests.exceptions.RequestException: If there is an issue with the API request.
+        * :return: A queryset containing a single ClimateModel instance populated with weather data.
+        * :rtype: ClimateModelQueryset
         """
         climate_model_data = CACHE.get(self.cache_key, self.cache_sentinel)
         if climate_model_data is self.cache_sentinel:
@@ -71,7 +71,7 @@ class ClimateModelQueryset(UserList):
     but serves as a placeholder for future enhancements.
 
     Attributes:
-        data (list): The list of ClimateModel instances.
+        * data (list): The list of ClimateModel instances.
     """
 
     pass
