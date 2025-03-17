@@ -23,12 +23,12 @@ class ClimateModelManager(models.Manager):
     and caches the response for a specified duration to minimize API requests.
 
     Attributes:
-        :api (str): The OpenWeather API key retrieved from environment variables.
-        :lat (str): The latitude coordinate for the weather query, retrieved from environment variables.
-        :lon (str): The longitude coordinate for the weather query, retrieved from environment variables.
-        :cache_key (str): The key used for caching the weather data.
-        :cache_sentinel (object): A unique object used to detect cache misses.
-        :cache_timeout (int): The duration (in seconds) for which the weather data is cached.
+    :api (str): The OpenWeather API key retrieved from environment variables.
+    :lat (str): The latitude coordinate for the weather query, retrieved from environment variables.
+    :lon (str): The longitude coordinate for the weather query, retrieved from environment variables.
+    :cache_key (str): The key used for caching the weather data.
+    :cache_sentinel (object): A unique object used to detect cache misses.
+    :cache_timeout (int): The duration (in seconds) for which the weather data is cached.
     """
 
     api = os.getenv("OPENWEATHER_API")
