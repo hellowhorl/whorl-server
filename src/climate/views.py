@@ -11,6 +11,17 @@ from climate.models import ClimateModel
 from climate.serializers import ClimateModelSerializer
 
 class ClimateDataViewAll(RetrieveAPIView):
+    """
+    API view to retrieve all climate data records.
+
+    This view provides a GET endpoint that returns the most recent climate data 
+    stored in the database. It retrieves all records from the `ClimateModel` table 
+    and returns the latest entry in JSON format.
+
+    Attributes:
+        permission_classes (list): Allows unrestricted access to the view.
+        serializer_class (ClimateModelSerializer): Defines the serializer for the model.
+    """
 
     permission_classes = [AllowAny]
     serializer_class = ClimateModelSerializer
