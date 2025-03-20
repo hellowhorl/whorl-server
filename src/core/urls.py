@@ -6,19 +6,19 @@ from drf_yasg import openapi
 
 urlpatterns = [
     re_path(
-        r'^v1/climate',
-        include(('climate.urls','climate'))
+        r'v1/climate/',
+        include(('climate.urls', 'climate'))
     ),
     re_path(
-        '^v1/inventory/',
+        r'v1/inventory/',
         include(('inventory.urls', 'inventory'))
     ),
     re_path(
-        r'^v1/omnipresence',
+        r'v1/omnipresence/',
         include(('omnipresence.urls', 'omnipresence'))
     ),
     re_path(
-        r'^v1/persona/',
+        r'v1/persona/',
         include(('persona.urls', 'persona'))
-    )
+    ),
 ]
