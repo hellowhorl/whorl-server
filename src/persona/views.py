@@ -23,14 +23,50 @@ client = OpenAI(
 class AssistantStream(AssistantEventHandler):
     pass
 
-class StreamPersonaGenerateView(APIView):
 
+class StreamPersonaGenerateView(APIView):
     """
-       This is not deprecated, but not nearly as useful as it seemed;
-       we keep in in here because one day it may return to service.
+    Real-time streaming interface for AI persona interactions using Server-Sent Events (SSE)
+
+    Endpoint: POST /generate/stream/<persona_name>/
+
+    Flow:
+    1. Validate requesting user through OmnipresenceModel
+    2. Retrieve or create conversation thread
+    3. Submit user message to OpenAI thread
+    4. Stream assistant response deltas via SSE
+
+    Parameters:
+    - persona_name (str): Name of registered PersonaModel instance
+    - Request Body:
+        * charname (str): OmnipresenceModel identifier
+        * message (str): User input content
+
+    Returns:
+        StreamingHttpResponse: text/event-stream format with raw text deltas
+
+    Exceptions:
+        - HTTP 400: Invalid persona_name or missing required fields
+        - HTTP 404: OmnipresenceModel not found
     """
 
     def __stream_assistant_response(self, thread_id, assistant_id, charname):
+        """
+        Internal generator for streaming OpenAI assistant responses
+
+        Args:
+            thread_id (str): OpenAI thread identifier
+            assistant_id (str): OpenAI assistant ID
+            charname (str): Owner identifier for logging/validation
+
+        Yields:
+            str: Text deltas from assistant response stream
+
+        Implementation Details:
+            - Uses OpenAI's beta threads.runs.stream endpoint
+            - Processes text_deltas in real-time
+            - Maintains stream until completion with until_done()
+        """
         with client.beta.threads.runs.stream(
             thread_id = thread_id,
             assistant_id = assistant_id,
@@ -41,6 +77,18 @@ class StreamPersonaGenerateView(APIView):
             stream.until_done()
 
     def post(self, request, persona_name, *args, **kwargs):
+        """
+        Handle POST request for streaming persona interaction
+
+        Parameters:
+            request (Request): Django request object
+            persona_name (str): Target assistant name from URL
+
+        Side Effects:
+            - Creates new PersonaThreadModel if none exists
+            - Updates thread_id in database
+            - Creates new OpenAI thread when needed
+        """
         assistant_id = None
         interactor = OmnipresenceModel.objects.get(
             charname = request.data.get('charname')
@@ -79,8 +127,42 @@ class StreamPersonaGenerateView(APIView):
         return stream
 
 class SyncPersonaGenerateView(APIView):
+    """
+    Synchronous AI persona interaction with full response handling
+
+    Endpoint: POST /generate/sync/<persona_name>/
+
+    Features:
+        - Complete message processing before response
+        - File citation extraction from responses
+        - Automatic thread management
+        - Polling mechanism for OpenAI run completion
+
+    Parameters:
+        - persona_name (str): Target PersonaModel name
+        - Request Body:
+            * charname (str): OmnipresenceModel identifier
+            * message (str): User input content
+
+    Returns:
+        HttpResponse: JSON with structure:
+            {
+                "response": "full assistant text",
+                "attachments": "file_id references"
+            }
+    """
 
     def post(self, request, persona_name, *args, **kwargs):
+        """
+        Process synchronous persona interaction request
+
+        Flow:
+            1. Validate user and persona existence
+            2. Create/maintain conversation thread
+            3. Submit message and poll for completion
+            4. Extract response content and file references
+            5. Return structured JSON response
+        """
         assistant_id = None
         interactor = OmnipresenceModel.objects.get(
             charname = request.data.get('charname')
@@ -141,9 +223,29 @@ class SyncPersonaGenerateView(APIView):
             status = 200
         )
 
+
 class PersonaSearchView(APIView):
+    """
+    Persona existence verification endpoint
+
+    Endpoint: GET /search/<persona_name>/
+
+    Functionality:
+        - Simple existence check for persona names
+        - No payload required
+
+    Responses:
+        - HTTP 200: Persona exists
+        - HTTP 404: Persona not found
+    """
 
     def get(self, request, persona_name, *args, **kwargs):
+        """
+        Execute persona existence check
+
+        Parameters:
+            persona_name (str): Name to check in PersonaModel registry
+        """
         try:
             person = PersonaModel.objects.get(
                 assistant_name = persona_name
@@ -152,9 +254,44 @@ class PersonaSearchView(APIView):
         except PersonaModel.DoesNotExist:
             return HttpResponse(status = 404)
 
+
 class PersonaCreateView(APIView):
+    """
+    Complete persona creation endpoint
+
+    Endpoint: POST /create/<persona_name>/
+
+    Creation Pipeline:
+        1. Vector store initialization
+        2. File upload to OpenAI storage
+        3. Assistant creation with file_search capabilities
+        4. Local PersonaModel registration
+        5. Owner association through OmnipresenceModel
+
+    Required Parameters:
+        - persona_name (URL): Desired assistant name
+        - persona_creator (str): OmnipresenceModel identifier
+        - persona_prompt (str): System instructions for AI
+        - file_binary (File): Knowledge base document
+        - persona_file_name (str): Document display name
+
+    Returns:
+        HttpResponse: JSON with creation status and IDs
+
+    Error Conditions:
+        - HTTP 400: Existing name || invalid creator || missing fields
+        - HTTP 500: OpenAI API failures
+    """
 
     def post(self, request, persona_name, *args, **kwargs):
+        """
+        Handle persona creation request
+        
+        File Handling:
+            - Accepts multipart/form-data uploads
+            - Processes files through OpenAI vector store API
+            - Associates files with created assistant
+        """
 
         vector_store = client.beta.vector_stores.create(name = "Inventory")
 
