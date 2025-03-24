@@ -4,7 +4,7 @@ class PersonaModel(models.Model):
 
     assistant_name = models.CharField(max_length = 255)
     assistant_id = models.CharField(max_length = 255)
-    asssistant_owner = models.ForeignKey(
+    assistant_owner = models.ForeignKey(
         'omnipresence.OmnipresenceModel',
         on_delete = models.DO_NOTHING,
         default = 1
