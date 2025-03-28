@@ -1,4 +1,21 @@
-""""""
+"""
+Persona Management Views
+
+This module defines the views and endpoints for managing AI assistant personas and their interactions.
+
+Features:
+    - Real-time and synchronous AI persona interaction endpoints
+    - Persona creation, search, and thread management
+    - Integration with OpenAI's API for assistant responses and tools
+
+Classes:
+    - StreamPersonaGenerateView: Handles real-time streaming interactions with AI personas.
+    - SyncPersonaGenerateView: Processes synchronous interactions with AI personas.
+    - PersonaSearchView: Provides an endpoint to verify the existence of a persona.
+    - PersonaCreateView: Handles the creation of new AI personas with OpenAI integration.
+    - PersonaThreadManagementView: Manages conversation threads, including termination and cleanup.
+"""
+
 import os
 import io
 import json
