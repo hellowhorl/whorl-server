@@ -15,7 +15,7 @@ def create_persona_example():
         "persona_file_name": "math_guide.pdf"
     }
 
-    # simulate a file upload
+    # simulate a file upload (this is not required though)
     files = {
         "file_binary": open("sample_math.pdf", "rb")
     }
