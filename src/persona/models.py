@@ -9,7 +9,6 @@ Relationships:
     - Both link to OmnipresenceModel
     - Threads reference PersonaModel
     - Includes simple as_dict() serialization
-
 """
 
 from django.db import models
