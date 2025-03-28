@@ -115,7 +115,29 @@ class DropInventoryView(APIView):
             return Response({"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND)
 
 class ListInventoryView(APIView):
+    """
+    API view to list all inventory items for a specific inventory holder.
 
+    This view handles GET requests to retieve inventory items associated
+    with a specific charaacter name. It queries the database for the inventory
+    holder's ID, fetches the inventory items belonging to that ID, serilizies
+    the data, and returns it as a JSON response.
+
+    Methods:
+        get(request, *args, **kwargs)
+            Handles GET requests to retrieve and return the inventory items.
+
+    Workflow: 
+        1. Retrieve the character name ('charname') from the request's query parameters.
+        2. Query the 'OmnipresenceModel' to get ID of the Inventory holder based 'charname'.
+        3. use the retrieved ID to filter the 'inventory' model for items owned by the inventory
+        4. Serialize the filtered inventory items using 'InventorySerializer'.
+        5. Return the serialized data as a JSON response with an HTTP 200 status.
+
+    Returns:
+        HttpResponse: A JSON response containing the serialized inventory items
+                      or an appropriate error message if the request fails.
+    """
     def get(self, request, *args, **kwargs):
         # Retrieve ID of inventory holder
         inventory_owner_data = omnipresence.models.OmnipresenceModel.objects.filter(
