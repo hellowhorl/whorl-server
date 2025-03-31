@@ -161,8 +161,35 @@ class ListInventoryView(APIView):
         )
 
 class SearchInventoryView(APIView):
+    """
+    API view to search for a specific inventory item owned by a character.
 
-    def post(self, request, *args, **kwargs):
+    This view handles POST requests to retrieve details of a specific inventory
+    item associated with a character. It queries the database for the inventory
+    holder's ID based on the character name, fetches the requested item, and
+    returns its details as a JSON response.
+
+    Methods:
+        post(request, *args, **kwargs):
+            Handles POST requests to search for and return the details of a specific inventory item.
+
+    Workflow:
+        1. Retrieve the character name (`charname`) from the request's data.
+        2. Query the `OmnipresenceModel` to get the ID of the inventory holder based on the `charname`.
+        3. Use the retrieved ID to search the `Inventory` model for the specified item.
+        4. If the item is found:
+            - Convert the item to a dictionary using its `as_dict` method.
+            - Remove the `item_owner` field from the response.
+            - Convert the `item_bytestring` field to a hexadecimal string for transmission.
+        5. Return the serialized item data as a JSON response with an HTTP 200 status.
+        6. If the item is not found, return an HTTP 404 status.
+
+    Returns:
+        HttpResponse:
+            - A JSON response containing the serialized item details if the item is found.
+            - An HTTP 404 response if the item does not exist.
+    """
+def post(self, request, *args, **kwargs):
         item_owner_record = omnipresence.models.OmnipresenceModel.objects.get(
             charname = request.data.get('charname')
         )
@@ -184,7 +211,36 @@ class SearchInventoryView(APIView):
         )
 
 class GiveInventoryView(GenericAPIView, UpdateModelMixin):
+    """
+    API view to transfer an inventory item from one character to another.
 
+    This view handles PATCH requests to facilitate the transfer of an inventory
+    item from one character (giver) to another (receiver). It updates the inventory
+    records for both characters to reflect the transfer.
+
+    Methods:
+        patch(request, to_charname, *args, **kwargs):
+            Handles PATCH requests to transfer an inventory item.
+
+    Workflow:
+        1. Retrieve the item name from the request data.
+        2. Retrieve the giver's and receiver's records from the `OmnipresenceModel` using their character names.
+        3. Fetch the inventory item from the giver's inventory.
+        4. If the item does not exist in the giver's inventory, return an HTTP 404 status.
+        5. Convert the item to a dictionary and update its owner to the receiver.
+        6. Check if the receiver already has the item:
+            - If the item exists, update its quantity and bulk.
+            - If the item does not exist, create a new record for the receiver.
+        7. Update the giver's inventory to reflect the reduced quantity and bulk.
+        8. Save the changes to both the giver's and receiver's inventory records.
+        9. Return an HTTP 200 status to indicate a successful transfer.
+
+    Returns:
+        HttpResponse:
+            - HTTP 200 status if the transfer is successful.
+            - HTTP 400 status if either the giver or receiver does not exist.
+            - HTTP 404 status if the item does not exist in the giver's inventory.
+    """
     def patch(self, request, to_charname, *args, **kwargs):
         item_name = request.data.get('item_name')
         # Retrieve the two parties' information
