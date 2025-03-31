@@ -26,7 +26,7 @@ schema_view = get_schema_view(
         description="API documentation for the Termunda Inventory service.",
         contact=openapi.Contact(email="dluman@allegheny.edu"),
         license=openapi.License(name="CC0"),
-    ),,
+    ),
     public=True,
     permission_classes=(permissions.AllowAny,),
 )
@@ -64,7 +64,6 @@ class AddInventoryView(APIView):
 
 
 class ReduceInventoryView(GenericAPIView, UpdateModelMixin):
-
     def patch(self, request, *args, **kwargs):
         item_owner_record = omnipresence.models.OmnipresenceModel.objects.get(
             charname=request.data.get("item_owner")
@@ -85,8 +84,6 @@ class ReduceInventoryView(GenericAPIView, UpdateModelMixin):
 
 
 class DropInventoryView(APIView):
-
-
     # TODO: Potentially also a patch request?
     # Super TODO: Can we drop this view altogether?
 
