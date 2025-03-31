@@ -33,34 +33,6 @@ schema_view = get_schema_view(
 
 
 class AddInventoryView(APIView):
-    """
-    Handles the addition of inventory items for a specific user.
-
-    Methods:
-        post(request, *args, **kwargs):
-            Processes a POST request to add or update an inventory item.
-
-    POST Request Parameters:
-        - item_owner (str): The character name of the item owner.
-        - item_name (str): The name of the item to be added or updated.
-        - item_consumable (bool): Indicates whether the item is consumable.
-        - item_binary (file): A binary file representing the item.
-        - item_qty (float): The quantity of the item to be added.
-
-    Behavior:
-        - Retrieves the item owner record based on the provided character name.
-        - Creates a new inventory item or retrieves an existing one based on the item owner ID and item name.
-        - Updates the item's attributes, including consumable status, binary data, and quantity.
-        - If the item already exists, updates its quantity and recalculates its bulk.
-        - Saves the item to the database.
-        - Handles potential database exceptions, such as exceeding inventory capacity.
-
-    Responses:
-        - 200: Item successfully added or updated.
-        - 400: Bad request.
-        - 409: Conflict, typically due to exceeding inventory capacity.
-    """
-
     def post(self, request, *args, **kwargs):
         item_owner_record = omnipresence.models.OmnipresenceModel.objects.get(
             charname=request.data.get("item_owner")
@@ -92,27 +64,6 @@ class AddInventoryView(APIView):
 
 
 class ReduceInventoryView(GenericAPIView, UpdateModelMixin):
-    """
-    ReduceInventoryView is a view that handles reducing the quantity of an item in the inventory.
-
-    This view supports PATCH requests to update the quantity of an item owned by a specific character.
-    If the item is not consumable and the request is not a drop request, no changes are made.
-
-    Methods:
-        patch(request, *args, **kwargs):
-            Handles the PATCH request to reduce the quantity of an item in the inventory.
-            - Retrieves the item owner record based on the provided character name.
-            - Retrieves the inventory item based on the owner ID and item name.
-            - Checks if the item is consumable or if the request is a drop request.
-            - Reduces the item quantity by 1 and updates the item's bulk based on its weight.
-            - Saves the updated item to the database.
-            - Returns an HTTP 200 response.
-
-    Attributes:
-        Inherits from:
-            - GenericAPIView: Provides generic behavior for API views.
-            - UpdateModelMixin: Provides behavior for updating model instances.
-    """
 
     def patch(self, request, *args, **kwargs):
         item_owner_record = omnipresence.models.OmnipresenceModel.objects.get(
@@ -134,36 +85,7 @@ class ReduceInventoryView(GenericAPIView, UpdateModelMixin):
 
 
 class DropInventoryView(APIView):
-    """
-    Handles the dropping of an inventory item via a POST request.
 
-    This view allows a user to reduce the quantity of a specific inventory item
-    associated with a given owner. If the item does not exist, an error response
-    is returned.
-
-    Methods:
-        post(request, *args, **kwargs):
-            Processes the POST request to drop an inventory item.
-
-    POST Request:
-        - Expects `item_name` (str): The name of the item to be dropped.
-        - Expects `item_owner` (str): The identifier of the item's owner.
-
-    Responses:
-        - 200 OK: If the item is successfully dropped.
-            Example: {"message": "Item dropped", "item": {...}}
-        - 400 Bad Request: If required fields are missing.
-            Example: {"error": "Item name is required"}
-        - 404 Not Found: If the specified item does not exist.
-            Example: {"error": "Item not found"}
-
-    Notes:
-        - The `item_owner` is fetched as a foreign key from the `OmnipresenceModel`.
-        - The view currently reduces the item's quantity by 1. If the quantity
-          reaches zero, additional handling may be required.
-        - There are TODOs in the code suggesting potential refactoring or
-          removal of this view.
-    """
 
     # TODO: Potentially also a patch request?
     # Super TODO: Can we drop this view altogether?
