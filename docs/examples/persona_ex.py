@@ -1,9 +1,12 @@
 import requests
 
+# base config
+BASE_URL = "http://localhost:8000/v1/persona"
+
 
 def create_persona_example():
     """Create a new persona for an AI assistant."""
-    url = "v1/persona/create/MathTutor"
+    url = f"{BASE_URL}/create/MathTutor"
 
     # sample persona creation data
     data = {
@@ -24,7 +27,7 @@ def create_persona_example():
 
 def create_thread_example(assistant_id):
     """Create a thread for a specific assistant."""
-    url = "v1/persona/thread/create"
+    url = f"{BASE_URL}/thread/create"
 
     data = {
         "thread_owner": "user_12345",
@@ -39,7 +42,7 @@ def create_thread_example(assistant_id):
 
 def cancel_thread_example(thread_id):
     """Cancel an existing thread."""
-    url = "v1/persona/cancel/{thread_id}"
+    url = f"{BASE_URL}/cancel/{thread_id}"
 
     response = requests.get(url)
     print(response)
